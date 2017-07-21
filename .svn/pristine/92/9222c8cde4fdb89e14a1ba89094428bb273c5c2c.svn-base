@@ -1,0 +1,135 @@
+// Finish and comment me!
+
+package model;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Objects;
+
+/**
+ * 
+ * @author Pamaldeep Dhillon
+ * @version 16 October 2015
+ */
+public final class Item {
+    /** */
+    private final String myName;
+    /** */
+    private final BigDecimal myPrice;
+    /** */
+    private int myBulkQuantity;
+    /** */
+    private BigDecimal myBulkPrice;
+    
+    /**
+     * 
+     * @param theName Name of the item.
+     * @param thePrice Price of the item.
+     */
+    public Item(final String theName, final BigDecimal thePrice) {
+        if (thePrice.compareTo(BigDecimal.ZERO) == -1) {
+            throw new IllegalArgumentException("Price must be a positive value!");
+        }
+        if (theName.isEmpty()) {
+            throw new IllegalArgumentException("Name of item can't be an empty string!");
+        }
+        myName = (String) Objects.requireNonNull(theName);
+        myPrice = (BigDecimal) Objects.requireNonNull(thePrice);
+    }
+
+    /**
+     * 
+     * @param theName Name of the item.
+     * @param thePrice Price of the item.
+     * @param theBulkQuantity Bulk quantity of the item.
+     * @param theBulkPrice Bulk price of the item.
+     */
+    public Item(final String theName, final BigDecimal thePrice, final int theBulkQuantity,
+                final BigDecimal theBulkPrice) {
+        if (thePrice.compareTo(BigDecimal.ZERO) == -1) {
+            throw new IllegalArgumentException("Price must be positive!");
+        }
+        if (theBulkPrice.compareTo(BigDecimal.ZERO) == -1) {
+            throw new IllegalArgumentException("Bulk price must be a positive value!");
+        }
+        if (theBulkQuantity < 0) {
+            throw new IllegalArgumentException("Bulk quantity must be a positive value!");
+        }
+        if (theName.isEmpty()) {
+            throw new IllegalArgumentException("Name of item can't be empty!");
+        }
+        myName = (String) Objects.requireNonNull(theName);
+        myPrice = (BigDecimal) Objects.requireNonNull(thePrice);
+        myBulkQuantity = theBulkQuantity;
+        myBulkPrice = theBulkPrice;
+    }
+
+    /**
+     * 
+     * @param theQuantity Quantity of the item.
+     * @return Price for quantity of item.
+     */
+    public BigDecimal calculateItemTotal(final int theQuantity) {
+        if (theQuantity < 0) {
+            throw new IllegalArgumentException("Quantity must be a positive value!");
+        }
+        BigDecimal totalPrice = new BigDecimal("0.00");
+        BigDecimal tempPrice;
+        int tempQuantity = theQuantity;
+        if (isBulk() && theQuantity >= myBulkQuantity) {
+            totalPrice = myBulkPrice;
+            tempQuantity -= myBulkQuantity;
+        }
+        tempPrice = myPrice.multiply(new BigDecimal(tempQuantity));
+        totalPrice = totalPrice.add(tempPrice);
+        return totalPrice.setScale(2, RoundingMode.HALF_EVEN);
+    }
+    
+    /**
+     * 
+     * @return bulk True if the Item has bulk pricing.
+     */
+    public boolean isBulk() {
+        boolean bulk = false;
+        if (myBulkPrice != null) {
+            bulk = true;
+        }
+        return bulk;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(myName);
+        sb.append(", $");
+        sb.append(myPrice);
+        if (isBulk()) {
+            sb.append(" (");
+            sb.append(myBulkQuantity);
+            sb.append(" for $");
+            sb.append(myBulkPrice);
+            sb.append(')');
+        }
+        return sb.toString();
+    }
+
+
+    @Override
+    public boolean equals(final Object theOther) {
+        boolean result = false;
+        if ((theOther != null) && (theOther.getClass() == this.getClass())) {
+            final Item otherItem = (Item) theOther;
+            result = myName.equals(otherItem.myName) && myPrice.equals(otherItem.myPrice)
+                    && myBulkQuantity == otherItem.myBulkQuantity 
+                    && myBulkPrice.equals(otherItem.myBulkPrice);
+        }
+        return result;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(myName, myPrice, myBulkQuantity, myBulkPrice);
+    }
+
+}

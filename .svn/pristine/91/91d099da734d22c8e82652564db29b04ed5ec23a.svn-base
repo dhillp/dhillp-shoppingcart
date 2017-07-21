@@ -1,0 +1,67 @@
+// Finish and comment me!
+
+package model;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+/**
+ * 
+ * @author Pamaldeep Dhillon
+ * @version 16 October 2015
+ */
+public final class ItemOrder {
+    /** */
+    private final Item myItem;
+    /** */
+    private final int myQuantity;
+    
+    /**
+     * 
+     * @param theItem Item in the order.
+     * @param theQuantity Quantity of the item in the order.
+     */
+    public ItemOrder(final Item theItem, final int theQuantity) {
+        if (theQuantity < 0) {
+            throw new IllegalArgumentException("Quantity must be a positive value!");
+        }
+        myItem = (Item) Objects.requireNonNull(theItem);
+        myQuantity = theQuantity;
+    }
+
+    /**
+     * 
+     * @return Cost of this item order.
+     */
+    public BigDecimal calculateOrderTotal() {
+        return myItem.calculateItemTotal(myQuantity);
+    }
+
+    /**
+     * 
+     * @return The Item in the order.
+     */
+    public Item getItem() {
+        return myItem;
+    }
+    
+    /**
+     * 
+     * @return Quantity of items.
+     */
+    public int getQuantity() {
+        return myQuantity;
+    }
+
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName());
+        sb.append(", ");
+        sb.append(myItem);
+        sb.append(' ');
+        sb.append(myQuantity);
+        return sb.toString();
+    }
+
+}

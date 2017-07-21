@@ -1,0 +1,95 @@
+// Finish and comment me!
+
+package model;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * 
+ * @author Pamaldeep Dhillon
+ * @version 16 October 2015
+ */
+public class ShoppingCart {
+    /** */
+    private final List<ItemOrder> myList;
+    /** */
+    private boolean myMembership;
+    
+    /**
+     * Constructor for the ShoppingCart.
+     */
+    public ShoppingCart() {
+        myList = new ArrayList<ItemOrder>();
+        myMembership = false;
+    }
+
+    /**
+     * 
+     * @param theOrder Item order to be added to the ShoppingCart.
+     */
+    public void add(final ItemOrder theOrder) {
+        final Iterator<ItemOrder> itr = myList.iterator();
+        while (itr.hasNext()) {
+            if (itr.next().getItem().equals(theOrder.getItem())) {
+                itr.remove();
+            }
+        }
+        myList.add((ItemOrder) Objects.requireNonNull(theOrder));
+    }
+
+    /**
+     * 
+     * @param theMembership True if customer has discount membership.
+     */
+    public void setMembership(final boolean theMembership) {
+        if (theMembership) {
+            myMembership = true;
+        } else {
+            myMembership = false;
+        }
+    }
+
+    /**
+     * 
+     * @return Total cost of items in ShoppingCart.
+     */
+    public BigDecimal calculateTotal() {
+        BigDecimal result = new BigDecimal("0.00");
+        BigDecimal discount;
+        for (final ItemOrder i : myList) {
+            if (i.getItem().isBulk()) {
+                result = result.add(i.calculateOrderTotal());
+            } else if (myMembership) {
+                discount = i.calculateOrderTotal().multiply(new BigDecimal("0.10"));
+                result = result.add(i.calculateOrderTotal().subtract(discount));
+            } else {
+                result = result.add(i.calculateOrderTotal());
+            }
+        }
+        return result.setScale(2, RoundingMode.HALF_EVEN);
+    }
+    
+    /**
+     * 
+     */
+    public void clear() {
+        myList.clear();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName());
+        sb.append(", ");
+        sb.append(myList);
+        sb.append(", $");
+        sb.append(calculateTotal());
+        return sb.toString();
+    }
+
+}
